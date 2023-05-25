@@ -1,0 +1,35 @@
+{% extends 'post/base.html' %}
+
+{% block content %}
+<div class="search">
+<label for='search'>Search request</label>
+<input type="text" name="search" value="Search" id="search">
+</div>
+<div>
+<ul class="list-posts">
+    {% for p in posts %}
+    <li>
+        <h2>{{p.author}}</h2>
+        {% if post.images %}
+            {% for image in images.objects.all %}
+                <p><img class="img-article-left" src="{{post.image}}"></p>
+            {% endfor %}
+        {% endif %}
+        {% if p.post_tags.all %}
+        <p>
+            Tags:
+            {% for post_tag in p.post_tags.all %}
+                <a href="{{post_tag.tag.get_absolute_url }}">{{ post_tag.tag.name }}</a>
+            {% endfor %}
+        </p>
+        {% endif %}
+        <p>{{p.caption|linebreaks|truncatewords:50}} </p>
+        <p>Date: {{p.update_at|date:"d.m.Y H:i"}}</p>
+        <div class="clear"></div>
+        <p class="link-read-post"><a href="{{ p.get_absolute_url }}">Read post</a></p>
+    </li>
+    {% endfor %}
+</ul>
+</div>
+
+{% endblock %}
