@@ -1,31 +1,33 @@
 {% extends 'post/base.html' %}
-
 {% block content %}
-<div>
+
 <ul class="list-posts">
+
+
     {% for p in posts %}
     <li>
         <h2>{{p.author}}</h2>
-        {% if post.images %}
-            {% for image in images.objects.all %}
-                <p><img class="img-article-left" src="{{post.image}}"></p>
+        {% if p.images %}
+            {% for image in p.images.all%}
+            <div class="image-container">
+                <img class="img-article-left" src="{{image.image.url}}" alt="Image">
+            </div>
             {% endfor %}
         {% endif %}
         {% if p.post_tags.all %}
-        <p>
-            Tags:
             {% for post_tag in p.post_tags.all %}
-                <a href="{{post_tag.tag.get_absolute_url }}">{{ post_tag.tag.name }}</a>
+                <a class="tag-link" href="{{post_tag.tag.get_absolute_url }}">#{{ post_tag.tag.name }}</a>
             {% endfor %}
-        </p>
         {% endif %}
-        <p>{{p.caption|linebreaks|truncatewords:50}} </p>
-        <p>Date: {{p.update_at|date:"d.m.Y H:i"}}</p>
-        <div class="clear"></div>
-        <p class="link-read-post"><a href="{{ p.get_absolute_url }}">Read post</a></p>
+        <div class="content">
+            <p class="partial-text">{{p.caption|linebreaks}}  </p>
+
+            <div class="clear"></div>
+            <p class="link-read-post"><a href="{{ p.get_absolute_url }}">Read post</a></p>
+        </div>
     </li>
     {% endfor %}
 </ul>
-</div>
+
 
 {% endblock %}

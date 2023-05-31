@@ -1,5 +1,15 @@
 {% extends 'post/base.html' %}
 
 {% block content %}
-<h1>Create post</h1>
+<h1>{{title}}</h1>
+
+<form action="{%url 'create_post' %}" method="post">
+    {% csrf_token %}
+
+    {% for f in form %}
+    <p><label class="form-label" for="{{ form.title.id_for_label }}">{{form.author.label}}</label>{{form.author}}</p>
+    <div class="form-error">{{form.title.errors}}</div>
+    {% endfor %}
+    <button type="submit">Create</button>
+</form>
 {% endblock %}

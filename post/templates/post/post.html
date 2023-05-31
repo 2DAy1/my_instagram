@@ -1,11 +1,12 @@
 {% extends 'post/base.html' %}
 
 {% block content %}
+<div class="posts-container">
 <h1>{{post.author}}</h1>
 
 {% if post.images %}
-    {% for image in images.objects.all %}
-        <p><img class="img-article-left" src="{{post.image}}"></p>
+    {% for image in post.images.all %}
+        <img class="img-article-left" src="{{image.image.url}}">
     {% endfor %}
 {% endif %}
 
@@ -19,4 +20,5 @@
 {% endif %}
 
 {{post.caption|linebreaks}}
+</div>
 {% endblock %}

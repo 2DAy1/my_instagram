@@ -1,7 +1,7 @@
-body{
+html, body{
+    height: 100%;
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-
 }
 
 ul {
@@ -17,14 +17,15 @@ a{
 
 .header {
     display: flex;
+    justify-content: center;
     align-items: center;
     height: 100px;
     background-color: white;
     border-bottom: 1px solid lightgray;
 }
-.mainu-container{
+.menu-container{
     display: flex;
-    justify-content: end;
+
 }
 
 .logo-container{
@@ -46,6 +47,7 @@ a{
 .mainmenu{
     display: flex;
     align-items: center;
+
 }
 
 .mainmenu li{
@@ -83,3 +85,33 @@ a{
     left: 0;
     transition: all .25s ease;
 }
+.content-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.posts-container{
+  height: 100%;
+  widht: 80%;
+}
+
+
+.image-container {
+  width: 100%; /* Adjust the width as needed */
+  max-width: 500px; /* Adjust the maximum width as needed */
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.list-posts li img{
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.tag-link{
+    text-transform: lowercase;
+    color: blue;
+}
+

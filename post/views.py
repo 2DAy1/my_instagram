@@ -1,5 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseNotFound, Http404
+
+from .forms import *
 from .models import *
 
 
@@ -14,13 +16,10 @@ menu = [
 
 def index(request):
     posts = Post.objects.all()
-    tags = Tag.objects.all()
 
 
     context = {
         'posts': posts,
-        'tags':tags,
-        'menu': menu,
         'title': 'Home',
         'tag_selected': 0,
     }
@@ -28,7 +27,7 @@ def index(request):
 
 
 def user_cabinet(request):
-    return render(request, 'post/user_cabinet.html', {'menu': menu, 'title': 'My Cabinet'})
+    return render(request, 'post/user_cabinet.html', context={'title': 'My Cabinet'})
 
 
 def register(request): ...
@@ -39,13 +38,9 @@ def login(request): ...
 
 def search_post(request):
     posts = Post.objects.all()
-    tags = Tag.objects.all()
-
 
     context = {
         'posts': posts,
-        'tags':tags,
-        'menu': menu,
         'title': 'Found post',
         'tag_selected': 0,
     }
@@ -56,15 +51,24 @@ def show_post(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     context = {
         'post': post,
-        'menu': menu,
         'author': post.author,
-        'tag': 1
     }
     return render(request, 'post/post.html', context=context)
 
 
 def create_post(request):
-    return render(request, 'post/create_post.html', {'menu': menu, 'title': 'Create post'})
+    if request.method == 'POST':
+        form = AddPostForm(request.POST)
+        if form.is_valid():
+            print(form.cleaned_data)
+    else:
+        form = AddPostForm()
+    context = {
+        'from':form,
+        'title': 'Create post'
+    }
+
+    return render(request, 'post/create_post.html',context=context)
 
 
 def show_tag(request, tag_id):
@@ -79,7 +83,6 @@ def show_tag(request, tag_id):
     context = {
         'posts': posts,
         'tags': tags,
-        'menu': menu,
         'title': 'Posts by tags',
         'tag_selected': tag_id,
     }
