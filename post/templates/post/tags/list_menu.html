@@ -1,0 +1,25 @@
+
+
+{% block mainmenu %}
+<div class="logo-container">
+    <a class="logo-link" href="{% url menu.0.url_name %}">
+        <span class="logo-text">MyInsta</span>
+    </a>
+</div>
+<div class="menu-container">
+<ul id ='mainmenu' class="mainmenu">
+
+    {% for m in menu %}
+        {% if not forloop.last %}
+            <li><a class="mainmenu-link" href="{% url m.url_name %}">{{m.title}}</a></li>
+        {% else %}
+            <li class="last"><a href="{% url m.url_name %}">{{m.title}}</a> </li>
+        {% endif %}
+    {% endfor %}
+</ul>
+</div>
+<div class="clear"></div>
+{% endblock mainmenu %}
+
+
+
