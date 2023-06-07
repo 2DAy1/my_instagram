@@ -3,7 +3,6 @@
 
 <ul class="list-posts">
 
-
     {% for p in posts %}
     <li>
         <h2>{{p.author}}</h2>
@@ -20,7 +19,7 @@
             {% endfor %}
         {% endif %}
         <div class="content">
-            <p class="partial-text">{{p.caption|linebreaks}}  </p>
+            <p class="partial-text">{{p.caption|linebreaks|truncatewords:50 }}  </p>
 
             <div class="clear"></div>
             <p class="link-read-post"><a href="{{ p.get_absolute_url }}">Read post</a></p>

@@ -71,22 +71,9 @@ a{
     left: 0;
     transition: all .25s ease;
 }
-.last{
-    position: relative;
-}
 
-.last::after{
-    content: '';
-    background: black;
-    height: 2px;
-    width: 100%;
-    position: absolute;
-    bottom: -8px;
-    left: 0;
-    transition: all .25s ease;
-}
 .content-container{
-  display: flex;
+
   justify-content: center;
   align-items: center;
 

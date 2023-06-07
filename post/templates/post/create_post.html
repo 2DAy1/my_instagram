@@ -1,15 +1,21 @@
 {% extends 'post/base.html' %}
 
 {% block content %}
-<h1>{{title}}</h1>
+<h1>{{ title }}</h1>
 
-<form action="{%url 'create_post' %}" method="post">
+<form action="{% url 'create_post' %}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
+    {{ imageform.management_form }}
+    {% for field in form %}
+        <p>
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+        </p>
 
-    {% for f in form %}
-    <p><label class="form-label" for="{{ form.title.id_for_label }}">{{form.author.label}}</label>{{form.author}}</p>
-    <div class="form-error">{{form.title.errors}}</div>
+        <div class="form-error">{{ field.errors }}</div>
     {% endfor %}
+
+
     <button type="submit">Create</button>
 </form>
 {% endblock %}
