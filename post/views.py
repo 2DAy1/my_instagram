@@ -1,11 +1,12 @@
 from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView
+from django.core.cache import cache
+from django.db.models import Prefetch
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.contrib import messages
 
 from django.views.generic import ListView, DetailView, CreateView
-
 
 from .forms import *
 from .models import *
@@ -15,7 +16,7 @@ from .utils import *
 # Create your views here.
 
 
-class PostHome(LoginRequiredMixin,DataMixin, ListView):
+class PostHome(LoginRequiredMixin, DataMixin, ListView):
     login_url = reverse_lazy('register')
     model = Post
     template_name = 'post/index.html'
@@ -28,7 +29,11 @@ class PostHome(LoginRequiredMixin,DataMixin, ListView):
         return dict(list(context.items()) + list(c_def.items()))
 
     def get_queryset(self):
-        return Post.objects.filter(is_published=True)
+        queryset = Post.objects.filter(is_published=True).select_related('author').prefetch_related(
+            Prefetch('post_tags', queryset=PostTag.objects.select_related('tag')),
+            Prefetch('images')
+        )
+        return queryset
 
 
 def profile(request):
@@ -59,8 +64,6 @@ class LoginUser(DataMixin, LoginView):
         return reverse_lazy('home')
 
 
-
-
 def logout_user(request):
     logout(request)
     messages.success(request, 'You are logged out')
@@ -78,7 +81,7 @@ def search_post(request):
     return render(request, 'post/search_post.html', context=context)
 
 
-class ShowPost(LoginRequiredMixin,DataMixin, DetailView):
+class ShowPost(LoginRequiredMixin, DataMixin, DetailView):
     login_url = reverse_lazy('register')
     model = Post
     template_name = 'post/post.html'
@@ -97,14 +100,13 @@ class CreatePost(DataMixin, CreateView):
     template_name = 'post/create_post.html'
     success_url = reverse_lazy('home')
 
-
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title='Create post')
         return dict(list(context.items()) + list(c_def.items()))
 
 
-class ShowTag(LoginRequiredMixin,DataMixin, ListView):
+class ShowTag(LoginRequiredMixin, DataMixin, ListView):
     login_url = reverse_lazy('register')
     model = Post
     template_name = 'post/index.html'
@@ -113,17 +115,30 @@ class ShowTag(LoginRequiredMixin,DataMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        slug = self.kwargs['tag_slug']
-        tag = get_object_or_404(Tag, slug=slug)
-        c_def = self.get_user_context(title='Tag - ' + str(tag),
-                                      tag_selected=self.kwargs['tag_slug'])
+        tag = self.get_tag()
+        c_def = self.get_user_context(title='Tag - ' + str(tag.name),
+                                      tag_selected=tag.pk)
         return dict(list(context.items()) + list(c_def.items()))
 
     def get_queryset(self):
+        tag = self.get_tag()
+        queryset = Post.objects.filter(
+            post_tags__tag=tag, is_published=True
+        ).select_related('author').prefetch_related(
+            Prefetch('post_tags', queryset=PostTag.objects.select_related('tag')),
+            Prefetch('images')
+        )
+        return queryset
+
+    def get_tag(self):
         slug = self.kwargs['tag_slug']
-        tag = get_object_or_404(Tag, slug=slug)
-        posts_list = tag.post_tags.values_list('post', flat=True)
-        return Post.objects.filter(pk__in=posts_list, is_published=True)
+        cache_key = f'tag_{slug}'
+        tag = cache.get(cache_key)
+        if tag is None:
+            tag = get_object_or_404(Tag, slug=slug)
+            cache.set(cache_key, tag)
+        return tag
+
 
 
 def pageNotFound(request, exception):

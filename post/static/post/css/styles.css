@@ -17,10 +17,11 @@ a{
 
 .header {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     height: 100px;
     background-color: white;
+    padding: 0 20px;
     border-bottom: 1px solid lightgray;
 }
 .menu-container{
@@ -54,10 +55,16 @@ a{
     padding: 0 10px;
     color: black;
     font-size: 24px;
+    
+}
+
+.mainmenu li:last-of-type{
+    padding-right: 0;
 }
 
 .mainmenu-link{
     position: relative;
+    transition: all .25s ease;
 }
 
 
@@ -69,19 +76,22 @@ a{
     position: absolute;
     bottom: -8px;
     left: 0;
+    transform: scaleX(0);
     transition: all .25s ease;
 }
 
-.content-container{
-
-  justify-content: center;
-  align-items: center;
-
+.mainmenu-link:hover{
+    font-weight: bold;
 }
+
+.mainmenu-link:hover::after{
+    transform: scaleX(1);
+}
+
 
 .posts-container{
   height: 100%;
-  widht: 80%;
+  width: 80%;
 }
 
 

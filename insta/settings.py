@@ -36,17 +36,21 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'livereload',
     'django.contrib.staticfiles',
+    'debug_toolbar',
     'post.apps.PostConfig',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'livereload.middleware.LiveReloadScript',
 ]
 
@@ -123,3 +127,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+
+AUTH_USER_MODEL = 'post.User'
+
+INTERNAL_IPS =[
+    '127.0.0.1',
+]
+
+CACHES = {
+    'default': {
+        'BACKEND': "django.core.cache.backends.filebased.FileBasedCache",
+        'LOCATION': os.path.join(BASE_DIR, 'insta_cache'),
+    }
+}
+

@@ -43,7 +43,7 @@ class PostForm(forms.ModelForm):
 
 class RegisterUserForm(UserCreationForm):
     username = forms.CharField(label='Login', widget=forms.TextInput(attrs={'class': 'form-input'}))
-    avatar = forms.ImageField(label='Avatar', widget=forms.ClearableFileInput(attrs={'class': 'form-input'}))
+    avatar = forms.ImageField(label='Avatar')
     email = forms.EmailField(label='Email', widget=forms.EmailInput(attrs={'class': 'form-input'}))
     password1 = forms.CharField(label='Password', widget=forms.PasswordInput(attrs={'class': 'form-input'}))
     password2 = forms.CharField(label='Repeat password', widget=forms.PasswordInput(attrs={'class': 'form-input'}))

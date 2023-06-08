@@ -1,23 +1,23 @@
 {% extends '../base.html' %}
 
 {% block content %}
-<h1>{{ title }}</h1>
+  <h1>{{ title }}</h1>
 
-<form method="post">
-  {% csrf_token %}
-  {% for f in form %}
-    <p>
-      <label class="form-label" for="{{ f.id_for_label }}">{{ f.label }}: </label>
-      {{ f }}
-    </p>
-    <div class="form-error">
-      {% for error in f.errors %}
-        <span class="error-message">{{ error }}</span>
-      {% endfor %}
-    </div>
-  {% endfor %}
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% for f in form %}
+      <p>
+        <label class="form-label" for="{{ f.id_for_label }}">{{ f.label }}: </label>
+        {{ f }}
+      </p>
+      <div class="form-error">
+        {% for error in f.errors %}
+          <span class="error-message">{{ error }}</span>
+        {% endfor %}
+      </div>
+    {% endfor %}
 
-  <button type="submit">Register</button>
-</form>
+    <button type="submit">Register</button>
+  </form>
 
 {% endblock %}
