@@ -22,7 +22,8 @@ from insta import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('insta/', include('post.urls'))
+    path('insta/', include('post.urls')),
+    path('captcha/', include('captcha.urls'))
 ]
 
 if settings.DEBUG:

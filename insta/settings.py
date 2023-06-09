@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'livereload',
     'django.contrib.staticfiles',
     'debug_toolbar',
+    'captcha',
     'post.apps.PostConfig',
 ]
 

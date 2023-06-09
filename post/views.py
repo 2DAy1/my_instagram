@@ -1,9 +1,12 @@
+from captcha.models import CaptchaStore
 from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView
-from django.core.cache import cache
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Prefetch
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseNotFound, Http404
+from captcha import helpers
 from django.contrib import messages
 
 from django.views.generic import ListView, DetailView, CreateView
@@ -55,10 +58,38 @@ class LoginUser(DataMixin, LoginView):
     form_class = LoginUserForm
     template_name = 'post/registration/login.html'
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title='Login')
-        return {**context, **c_def}
+
+        captcha_id = CaptchaStore.generate_key()
+        captcha_image_url = helpers.captcha_image_url(captcha_id)
+
+        return {**context, **c_def, 'captcha_image_url': captcha_image_url, 'captcha_id': captcha_id}
+
+    def form_invalid(self, form):
+        # Increment the login attempts count
+        if 'login_attempts' not in self.request.session:
+            self.request.session['login_attempts'] = 1
+        else:
+            self.request.session['login_attempts'] += 1
+
+        # If login attempts reach 2, add captcha field to form
+        if self.request.session.get('login_attempts', 0) >= 2:
+            form.fields['captcha'] = CaptchaField()
+
+        return super().form_invalid(form)
+
+    def get_response_error(self, form):
+        # Customize the response when captcha validation fails
+        # You can modify this method to handle the failure scenario as per your requirements
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def form_valid(self, form):
+        # Reset the login attempts count
+        self.request.session['login_attempts'] = 0
+
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy('home')
