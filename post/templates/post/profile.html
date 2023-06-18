@@ -1,5 +1,23 @@
 {% extends 'post/base.html' %}
+{% load custom_tags %}
 
 {% block content %}
-<h1>User cabinet </h1>
+<h1>{{user.username}}</h1>
+{% if user.avatar %}
+<div class="avatar-container">
+    <img class="avatar-img" src="{{ user.avatar.url }}" alt="Avatar">
+  </div>
+{% endif %}
+<h2>{{user.fullname}}</h2>
+<p>{{user.bio}}</p>
+
+
+{% for post in author.post.all %}
+    
+<div class="image-container">
+    <a href="{{ post.get_absolute_url }}"></a><img class="img-article-left" src="{{ post.images.first.image.url }}" alt="Image"></a>
+  </div>
+
+    
+{% endfor %}
 {% endblock %}

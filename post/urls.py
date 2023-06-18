@@ -12,5 +12,6 @@ urlpatterns = [
     path('posts/<int:post_pk>/', ShowPost.as_view(), name='post'),
     path('create', CreatePost.as_view(), name='create_post'),
     path('profile', profile, name='profile'),
-    path('tag/<slug:tag_slug>/', ShowTag.as_view(), name='tag')
+    path('tag/<slug:tag_slug>/', ShowTag.as_view(), name='tag'),
+    path('post-like/<int:pk>', liked_post, name="post_like"),
 ]

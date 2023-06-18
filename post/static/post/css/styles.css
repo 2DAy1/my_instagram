@@ -88,7 +88,12 @@ a{
     transform: scaleX(1);
 }
 
-
+.avatar-img{
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 4px solid #ccc;
+}
 .posts-container{
   height: 100%;
   width: 80%;

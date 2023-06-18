@@ -35,7 +35,7 @@ class UserManager(BaseUserManager):
             'uid': urlsafe_base64_encode(force_bytes(user.pk)),
             'token': default_token_generator.make_token(user),
         })
-        send_mail(mail_subject, message, 'noreply@example.com', [user.email])
+        send_mail(mail_subject, message, 'noreply@gmail.com', [user.email])
 
     def confirm_email(self, uid, token):
         try:
@@ -51,10 +51,10 @@ class UserManager(BaseUserManager):
 
         return None
 
-    def create_superuser(self, email, username, password=None, **extra_fields):
+    def create_superuser(self, username, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        return self.create_user(email, username, password, **extra_fields)
+        return self.create_user(username, password, **extra_fields)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -88,10 +88,13 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
     caption = models.TextField(blank=True)
+    likes = models.ManyToManyField(User, related_name='post_like')
     created_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
     is_published = models.BooleanField(default=True)
 
+    def number_of_likes(self):
+        return self.likes.count()
 
     class Meta:
         verbose_name = 'User\'s posts'
@@ -103,6 +106,8 @@ class Post(models.Model):
 
     def get_absolute_url(self):
         return reverse('post', kwargs={'post_pk': self.pk})
+
+
 
 
 class Image(models.Model):

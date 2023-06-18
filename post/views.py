@@ -5,9 +5,11 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Prefetch
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, HttpResponseNotFound, Http404
+from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect, JsonResponse
 from captcha import helpers
 from django.contrib import messages
+from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 
 from django.views.generic import ListView, DetailView, CreateView
 
@@ -19,8 +21,44 @@ from .utils import *
 # Create your views here.
 
 
+
+
+class ShowPost(LoginRequiredMixin, DataMixin, View):
+    login_url = reverse_lazy('login')
+    template_name = 'post/show_post.html'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        post = self.get_object()
+        context = self.get_context_data(post=post)
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        post = self.get_object()
+        return LikePost.like_post(request, post)
+
+    def get_object(self):
+        post_pk = self.kwargs['post_pk']
+        post = get_object_or_404(Post, pk=post_pk)
+        return post
+
+    def get_context_data(self, **kwargs):
+        context = {}
+        post = kwargs.get('post')
+        if post:
+            context['post'] = post
+            context['number_of_likes'] = post.number_of_likes()
+            context['post_is_liked'] = post.likes.filter(id=self.request.user.id).exists()
+
+        c_def = self.get_user_context(title=context.get('post'))
+        context.update(c_def)
+        return context
+
 class PostHome(LoginRequiredMixin, DataMixin, ListView):
-    login_url = reverse_lazy('register')
+    login_url = reverse_lazy('login')
     model = Post
     template_name = 'post/index.html'
     context_object_name = 'posts'
@@ -29,7 +67,8 @@ class PostHome(LoginRequiredMixin, DataMixin, ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title='My insta')
-        return dict(list(context.items()) + list(c_def.items()))
+        context.update(c_def)
+        return context
 
     def get_queryset(self):
         queryset = Post.objects.filter(is_published=True).select_related('author').prefetch_related(
@@ -38,10 +77,14 @@ class PostHome(LoginRequiredMixin, DataMixin, ListView):
         )
         return queryset
 
+    def post(self, request, *args, **kwargs):
+        post_pk = request.POST.get('post_id')
+        post = get_object_or_404(Post, pk=post_pk)
+        return LikePost.like_post(request, post)
+
 
 def profile(request):
     return render(request, 'post/profile.html', context={'title': 'Profile'})
-
 
 class RegisterUser(DataMixin, CreateView):
     form_class = RegisterUserForm
@@ -112,21 +155,15 @@ def search_post(request):
     return render(request, 'post/search_post.html', context=context)
 
 
-class ShowPost(LoginRequiredMixin, DataMixin, DetailView):
-    login_url = reverse_lazy('register')
-    model = Post
-    template_name = 'post/post.html'
-    pk_url_kwarg = 'post_pk'
-    context_object_name = 'post'
 
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title=context['post'])
-        return dict(list(context.items()) + list(c_def.items()))
+
+
+
+
 
 
 class CreatePost(DataMixin, CreateView):
-    login_url = reverse_lazy('register')
+    login_url = reverse_lazy('login')
     form_class = PostForm
     template_name = 'post/create_post.html'
     success_url = reverse_lazy('home')
@@ -138,7 +175,7 @@ class CreatePost(DataMixin, CreateView):
 
 
 class ShowTag(LoginRequiredMixin, DataMixin, ListView):
-    login_url = reverse_lazy('register')
+    login_url = reverse_lazy('login')
     model = Post
     template_name = 'post/index.html'
     context_object_name = 'posts'
@@ -170,7 +207,14 @@ class ShowTag(LoginRequiredMixin, DataMixin, ListView):
             cache.set(cache_key, tag)
         return tag
 
+def liked_post(request, pk):
+    post = get_object_or_404(Post, id=request.POST.get('post_id'))
+    if post.likes.filter(id=request.user.id).exists():
+        post.likes.remove(request.user)
+    else:
+        post.likes.add(request.user)
 
+    return HttpResponseRedirect(reverse('post-detail', args=[str(pk)]))
 
 def pageNotFound(request, exception):
     return HttpResponseNotFound('<h1>Page not found</h1>')
