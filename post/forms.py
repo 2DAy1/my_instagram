@@ -19,14 +19,16 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ['author', 'images', 'caption', 'is_published', 'tag_names']
+        fields = ['images', 'caption', 'is_published', 'tag_names']
         widgets = {
             'caption': forms.Textarea(attrs={'cols': 60, 'rows': 10})
         }
 
-    def save(self, commit=True, author=None, *args, **kwargs):
+    def save(self, commit=True, *args, **kwargs):
         post = super().save(commit=False)
-        post.author = author
+        user = kwargs.get('user')
+        if user:
+            post.author = user.username
         post.save()
 
         for image in self.cleaned_data['images']:
@@ -38,7 +40,7 @@ class PostForm(forms.ModelForm):
             for name in tag_names:
                 name = name.strip()
                 tag, _ = Tag.objects.get_or_create(name=name)
-                post.tags.add(tag)
+                PostTag.objects.create(post=post, tag=tag)
 
         return post
 

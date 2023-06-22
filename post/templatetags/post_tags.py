@@ -7,7 +7,6 @@ menu = [
     {'title': 'Home', 'url_name': 'home'},
     {'title': 'Search', 'url_name': 'search_post'},
     {'title': 'Create', 'url_name': 'create_post'},
-    # {'title': 'Profile', 'url_name': 'profile'},
 ]
 
 
@@ -20,5 +19,6 @@ def get_menu():
 def show_menu(context):
     return {'menu': menu, 'user': context.request.user}
 
-
-
+@register.inclusion_tag('post/tags/post.html')
+def show_post(post):
+    return {'post': post}

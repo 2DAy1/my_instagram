@@ -1,7 +1,9 @@
 from django.db.models import Count
+from django.http import JsonResponse
+from django.core.cache import cache
 
 from .models import *
-from django.core.cache import cache
+
 
 
 class DataMixin:
@@ -22,7 +24,7 @@ class DataMixin:
 
         return context
 
-from django.http import JsonResponse
+
 
 class LikePost:
     @staticmethod

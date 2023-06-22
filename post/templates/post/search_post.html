@@ -1,24 +1,19 @@
 {% extends 'post/base.html' %}
-
+{% load post_tags %}
 {% block content %}
-<div class="search">
-    <label for='search'>Search request</label>
-    <input type="text" name="search" value="Search" id="search">
-</div>
-<div class="posts-container">
-<ul class="list-posts">
-    {% for p in posts %}
-    <li>
-        {% if p.images %}
-            {% for image in p.images.all%}
-                <p class="link-read-post"><a href="{{ p.get_absolute_url }}"><img class="img-article-left"
-                                                                                  src="{{image.image.url}}"></a></p>
 
-            {% endfor %}
-        {% endif %}
-    </li>
-    {% endfor %}
-</ul>
+
+<h1>Search Results</h1>
+
+<form method="GET">
+  <input type="text" name="search_query" id="searchQueryInput" placeholder="Enter author or tag name" />
+  <button type="submit">Search</button>
+</form>
+
+<div class="list-posts">
+  {% for post in object_list %}
+    {% show_post post %}
+  {% endfor %}
 </div>
 
 {% endblock %}

@@ -1,51 +1,19 @@
 {% extends 'post/base.html' %}
-{% load custom_tags %}  <!-- Load custom template tags %} -->
-{% load static %}
+
+{% load post_tags %}
 {% block content %}
 
 
 
-<ul class="list-posts">
+<div class="list-posts">
   {% for post in posts %}
-  <li>
-    <h2>{{ post.author }}</h2>
-    {% if post.images %}
-    {% for image in post.images.all %}
-    <div class="image-container">
-      <img class="img-article-left" src="{{ image.image.url }}" alt="Image">
-    </div>
 
-          {% endfor %}
-    {% endif %}
-    <p><button class="like-button" id="likeButton-{{ post.id }}" data-post-id="{{ post.id }}" data-liked="{{ post_is_liked }}">
-      {% if post_is_liked %}
-        Unlike
-      {% else %}
-        Like
-      {% endif %}
-    </button>
-  
-    <strong id="likesCount-{{ post.id }}">{{ number_of_likes }} Like{{ number_of_likes|pluralize }}</strong>
-    </p>
-  
-    {% if post.post_tags.all %}
-    {% for post_tag in post.post_tags.all %}
-    <a class="tag-link" href="{{ post_tag.tag.get_absolute_url }}">#{{ post_tag.tag.name }}</a>
-    {% endfor %}
-    {% endif %}
-    <div class="content">
-      <p class="partial-text">{{ post.caption|linebreaks|truncatewords:50 }}  </p>
+    {% show_post post %}
 
-      <div class="clear"></div>
-      <p class="link-read-post"><a href="{{ post.get_absolute_url }}">Read post</a></p>
 
-        </div>
-
-  </li>
 
   {% endfor %}
-</ul>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="{% static 'post/js/post.js' %}"></script>
+</div>
+
 {% endblock %}
 

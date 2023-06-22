@@ -94,10 +94,20 @@ a{
     border-radius: 50%;
     border: 4px solid #ccc;
 }
-.posts-container{
-  height: 100%;
-  width: 80%;
-}
+.list-posts {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+  }
+  
+.list-posts li {
+    width: 50%;
+    /* Add any other styles you want for the list items */
+    display: flex;
+    justify-content: center; /* Center items horizontally */
+  }
+  
+
 
 
 .image-container {
@@ -115,5 +125,53 @@ a{
 .tag-link{
     text-transform: lowercase;
     color: blue;
+}
+
+
+.caption-container p{
+    --max-lines: 3;
+    --line-height:1.4;
+
+    max-height: calc(var(--max-lines)*1em*var(--line-height));
+    line-height: var(--line-height);
+    
+    overflow: hidden;
+    position: relative;
+}
+
+.caption-container p::before{
+    content: '';
+    position: absolute;
+    height: calc(1em*var(--line-height));
+    width: 100%;
+    bottom:0;
+    pointer-events: none;
+
+}
+
+.expand-btn{
+    appearance: none;
+    border: 1px solid black;
+    padding: .5em;
+    border-radius: .25em;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+
+.expand-btn:hover{
+    background-color: #ccc;
+}
+
+.expand-btn::before{
+    content: 'Expand';
+}
+
+.expand-btn:checked::before{
+    content: 'Collapse';
+}
+
+.cutoff-text:has(+ .expand-btn:checked){
+    max-height: none;
+
 }
 

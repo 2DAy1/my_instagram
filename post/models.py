@@ -7,9 +7,11 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.template.loader import render_to_string
 from django.contrib.auth.tokens import default_token_generator
+from django.utils.text import slugify
+
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, password=None, username=None,**extra_fields):
+    def create_user(self, email, password=None, username=None, **extra_fields):
         if not email:
             raise ValueError('The Email field must be set')
         email = self.normalize_email(email)
@@ -22,7 +24,6 @@ class UserManager(BaseUserManager):
 
         # Send email confirmation
         self.send_email_confirmation(user)
-
 
         return user
 
@@ -60,9 +61,11 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=255, unique=True, blank=False)
+    avatar = models.ImageField(upload_to='avatars/', blank=False)
     full_name = models.CharField(max_length=255, blank=False)
     bio = models.TextField(blank=True, max_length=500)
-    avatar = models.ImageField(upload_to='avatars/', blank=False)
+    followers = models.ManyToManyField('self', related_name='follower', blank=True)
+    following = models.ManyToManyField('self', related_name='following', blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
@@ -83,6 +86,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
+
+
+class Relationship(models.Model):
+    from_user = models.ForeignKey(User, related_name='from_users', on_delete=models.CASCADE)
+    to_user = models.ForeignKey(User, related_name='to_users', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class Post(models.Model):
@@ -108,8 +117,6 @@ class Post(models.Model):
         return reverse('post', kwargs={'post_pk': self.pk})
 
 
-
-
 class Image(models.Model):
     post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to=f'images/', blank=False)
@@ -121,9 +128,15 @@ class Image(models.Model):
         self.image.upload_to = f'images/{self.post.author}'
         super().save(*args, **kwargs)
 
+
 class Tag(models.Model):
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name='URL')
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -138,5 +151,3 @@ class PostTag(models.Model):
 
     def __str__(self):
         return f'Post: {self.post}, Tag:{self.tag}'
-
-

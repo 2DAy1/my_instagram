@@ -2,22 +2,34 @@
 {% load custom_tags %}
 
 {% block content %}
-<h1>{{user.username}}</h1>
+<h1>{{ user.username }}</h1>
 {% if user.avatar %}
 <div class="avatar-container">
     <img class="avatar-img" src="{{ user.avatar.url }}" alt="Avatar">
-  </div>
+</div>
 {% endif %}
-<h2>{{user.fullname}}</h2>
-<p>{{user.bio}}</p>
+<h2>{{ user.fullname }}</h2>
+<p>{{ user.bio }}</p>
 
+<h3>Followers:</h3>
+<ul>
+    {% for follower in followers %}
+    <li>{{ follower.username }}</li>
+    {% endfor %}
+</ul>
 
-{% for post in author.post.all %}
-    
+<h3>Following:</h3>
+<ul>
+    {% for user in following %}
+    <li>{{ user.username }}</li>
+    {% endfor %}
+</ul>
+
+{% for post in user.posts.all %}
 <div class="image-container">
-    <a href="{{ post.get_absolute_url }}"></a><img class="img-article-left" src="{{ post.images.first.image.url }}" alt="Image"></a>
-  </div>
-
-    
+    <a href="{{ post.get_absolute_url }}">
+        <img class="img-article-left" src="{{ post.images.first.image.url }}" alt="Image">
+    </a>
+</div>
 {% endfor %}
 {% endblock %}
