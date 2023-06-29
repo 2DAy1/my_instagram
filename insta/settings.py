@@ -24,7 +24,8 @@ SECRET_KEY = 'django-insecure-h+-s-%n62!1!#oxta!gx3ok0ugx=f59khzrxl)^4_ixpsi*aw2
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['dolinsta.azurewebsites.net', '20.49.104.37', '127.0.0.1']
+
+ALLOWED_HOSTS = ['dolynskyinstagram.azurewebsites.net', '20.49.104.37', '127.0.0.1']
 
 # Application definition
 
@@ -81,11 +82,14 @@ WSGI_APPLICATION = 'insta.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
+        'NAME': os.environ.get('DB_NAME', 'your_database_name'),
+        'USER': os.environ.get('DB_USER', 'your_username'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'your_password'),
     }
 }
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -121,9 +125,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, 'static'),
-# ]
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 
 
